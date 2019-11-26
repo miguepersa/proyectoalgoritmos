@@ -15,7 +15,7 @@ class Tablero():
 	game = None
 	f_blanca = None
 	f_negra = None
-
+	fichas_restantes = 60
 
 	def __init__(self,game,width,height,offset_x,offset_y):
 		self.size = 8
@@ -28,7 +28,7 @@ class Tablero():
 		self.f_negra = pg.transform.scale(game.f_negra,(int(width/8 * 0.8),int(height/8 * 0.8)))
 
 	def ubicacion_click(self,click_pos):
-		segment_size = self.width / self.size
+		segment_size = self.width / 8
 
 		x = (click_pos[1] - self.offset_y)//segment_size
 		y = (click_pos[0] - self.offset_x)//segment_size
@@ -37,8 +37,8 @@ class Tablero():
 
 	def hay_jugadas(self):
 		result = False
-		for x in range(0,self.size):
-			for y in range(0,self.size):
+		for x in range(0,8):
+			for y in range(0,8):
 				result = result or self.board[x][y] == 0
 
 		return result
@@ -46,9 +46,9 @@ class Tablero():
 	def jugada_en_tablero(self,x,y):
 		return (x >= 0 and y >= 0 and x < 8 and y < 8 and self.board[x][y] == 0)
 
-	def jugada_valida(self,x,y):
+	def jugada_valida(self,x,y,turno):
 		if x>0 and y>0:
-			if x<(self.size-1) and y<(self.size-1):
+			if x<(8-1) and y<(8-1):
 				alrededor = [
 					self.board[y][x+1],
 					self.board[y+1][x+1],
@@ -59,7 +59,7 @@ class Tablero():
 					self.board[y][x-1],
 					self.board[y-1][x-1]
 				]
-			elif x==(self.size-1) and y<(self.size-1):
+			elif x==(8-1) and y<(8-1):
 				alrededor = [
 					self.board[y-1][x],
 					self.board[y+1][x],
@@ -67,7 +67,7 @@ class Tablero():
 					self.board[y][x-1],
 					self.board[y-1][x-1]
 				]
-			elif x<(self.size-1) and y==(self.size-1):
+			elif x<(8-1) and y==(8-1):
 				alrededor = [
 					self.board[y][x+1],
 					self.board[y-1][x+1],
@@ -75,14 +75,14 @@ class Tablero():
 					self.board[y][x-1],
 					self.board[y-1][x-1]
 				]
-			elif x==(self.size-1) and y==(self.size-1):
+			elif x==(8-1) and y==(8-1):
 				alrededor = [
 					self.board[y-1][x],
 					self.board[y][x-1],
 					self.board[y-1][x-1]
 				]
 		elif x==0 and y>0:
-			if y<(self.size-1):
+			if y<(8-1):
 				alrededor = [
 					self.board[y][x+1],
 					self.board[y+1][x+1],
@@ -90,14 +90,14 @@ class Tablero():
 					self.board[y-1][x],
 					self.board[y+1][x],
 				]
-			elif y==(self.size-1):
+			elif y==(8-1):
 				alrededor = [
 					self.board[y][x+1],
 					self.board[y-1][x+1],
 					self.board[y-1][x],
 				]
 		elif x>0 and y==0:
-			if x<(self.size-1):
+			if x<(8-1):
 				alrededor = [
 					self.board[y][x+1],
 					self.board[y+1][x+1],
@@ -105,7 +105,7 @@ class Tablero():
 					self.board[y+1][x-1],
 					self.board[y][x-1],
 				]
-			elif x==(self.size-1):
+			elif x==(8-1):
 				alrededor = [
 					self.board[y+1][x],
 					self.board[y+1][x-1],
@@ -118,35 +118,38 @@ class Tablero():
 				self.board[y+1][x+1],
 				self.board[y+1][x],
 				]
-
-		return self.jugada_en_tablero(x,y) and any(i!=0 for i in alrededor)
+		if turno == 1:
+			otroturno=2
+		if turno == 2:
+			otroturno = 1
+		return self.jugada_en_tablero(x,y) and any(i!=0 for i in alrededor) and any(i==otroturno for i in alrededor)
 
 	def render_board(self):
-		segment_size = self.width / self.size
+		segment_size = self.width / 8
 
 		# dibujando las lineas
-		for x in range(0,self.size+1):
+		for x in range(0,8+1):
 			pg.draw.line(self.game.screen,BLACK,(self.offset_x + segment_size * x,self.offset_y),
 			(self.offset_x + segment_size * x,self.offset_y + self.height),5)
-		for y in range(0,self.size+1):
+		for y in range(0,8+1):
 			pg.draw.line(self.game.screen,BLACK,(self.offset_x,self.offset_y + segment_size * y),
 			(self.offset_x + self.width,self.offset_y + segment_size * y),5)
 
 		# dibujando las fichas
-		for x in range(0,self.size):
-			for y in range(0,self.size):
+		for x in range(0,8):
+			for y in range(0,8):
 				if self.board[x][y] == 1:
 					self.game.screen.blit(self.game.f_blanca,
 							(
-								self.offset_x + segment_size * y + int(self.width/self.size * 0.1),
-								self.offset_y + segment_size * x + int(self.height/self.size * 0.1)
+								self.offset_x + segment_size * y + int(self.width/8 * 0.1),
+								self.offset_y + segment_size * x + int(self.height/8 * 0.1)
 							)
 						)
 				if self.board[x][y] == 2:
 					self.game.screen.blit(self.game.f_negra,
 							(
-								self.offset_x + segment_size * y + int((self.width/self.size) * 0.1),
-								self.offset_y + segment_size * x + int(self.height/self.size * 0.1)
+								self.offset_x + segment_size * y + int((self.width/8) * 0.1),
+								self.offset_y + segment_size * x + int(self.height/8 * 0.1)
 							)
 						)
 
@@ -154,9 +157,156 @@ class Tablero():
 		if self.board[x_pos][y_pos] == 0:
 			self.board[x_pos][y_pos] = jugador.index
 
+
+	# metodo que chequea lineas verticales
+	def check_horizon(self,ficha,xinicio,yinicio):
+		otraficha = 0
+		ycambio = 1
+		fichasCambio = []
+		if ficha == 1:
+			otraficha = 2
+		elif ficha == 2:
+			otraficha = 1
+		if self.board[xinicio][yinicio+1] == otraficha:
+			while ycambio+yinicio<8 and self.board[xinicio][ycambio+yinicio] == otraficha:
+				fichasCambio.append([xinicio,ycambio+yinicio])
+				ycambio += 1
+			if self.board[xinicio][yinicio+ycambio] == ficha:
+				for i,j in fichasCambio:
+					self.board[i][j] = ficha
+		if self.board[xinicio][yinicio] == otraficha:
+			ycambio = -1
+			while ycambio+yinicio>=0 and self.board[xinicio][ycambio+yinicio] == otraficha:
+				fichasCambio.append([xinicio,ycambio+yinicio])
+				ycambio -= 1
+			if self.board[xinicio][yinicio+ycambio] == ficha:
+				for i,j in fichasCambio:
+					self.board[i][j] = ficha
+
+
+	# metodo que chequea lineas horizontales
+	def check_vertical(self,ficha,xinicio,yinicio):
+		otraficha = 0
+		xcambio = 1
+		fichasCambio = []
+		if ficha == 1:
+			otraficha = 2
+		elif ficha == 2:
+			otraficha = 1
+		if self.board[xinicio+1][yinicio] == otraficha:
+			while xcambio+xinicio<8 and self.board[xinicio+xcambio][yinicio] == otraficha:
+				fichasCambio.append([xinicio+xcambio,yinicio])
+				xcambio += 1
+			if self.board[xinicio+xcambio][yinicio] == ficha:
+				for i,j in fichasCambio:
+					self.board[i][j] = ficha		
+		if self.board[xinicio-1][yinicio] == otraficha:
+			xcambio = -1
+			while xcambio+xinicio>=0 and self.board[xinicio+xcambio][yinicio] == otraficha:
+				fichasCambio.append([xinicio+xcambio,yinicio])
+				xcambio -= 1
+			if self.board[xinicio+xcambio][yinicio] == ficha:
+				for i,j in fichasCambio:
+					self.board[i][j] = ficha
+
+	# metodo que chequea lineas diagonales
+	def check_diagonal(self,ficha,xinicio,yinicio):
+		otraficha = 0
+		fichasCambio = []
+		if ficha == 1:
+			otraficha = 2
+		elif otraficha == 2:
+			otraficha = 1
+		ycambio = 1
+		xcambio = 1
+		if self.board[xinicio+1][yinicio+1] == otraficha:
+			while xcambio+xinicio<8 and ycambio+yinicio<8 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
+				fichasCambio.append([xinicio+xcambio,yinicio+ycambio])
+				xcambio += 1
+				ycambio += 1
+			if self.board[xinicio+xcambio][yinicio+ycambio] == ficha:
+					for i,j in fichasCambio:
+						self.board[i][j] = ficha
+		if self.board[xinicio-1][yinicio-1] == otraficha:
+			xcambio = -1
+			ycambio = -1
+			while xcambio+xinicio>=0 and ycambio+yinicio>=0 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
+				fichasCambio.append([xinicio+xcambio,yinicio+ycambio])
+				xcambio -= 1
+				ycambio -= 1
+			if self.board[xinicio+xcambio][yinicio+ycambio] == ficha:
+					for i,j in fichasCambio:
+						self.board[i][j] = ficha
+
+		if self.board[xinicio+1][yinicio-1] == otraficha:
+			xcambio = 1
+			ycambio = -1
+			while xcambio+xinicio<8 and ycambio+yinicio>=0 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
+				fichasCambio.append([xinicio+xcambio,yinicio+ycambio])
+				xcambio += 1
+				ycambio -= 1
+			if self.board[xinicio+xcambio][yinicio+ycambio] == ficha:
+					for i,j in fichasCambio:
+						self.board[i][j] = ficha
+
+		if self.board[xinicio-1][yinicio+1] == otraficha:
+			xcambio = -1
+			ycambio = 1
+			while xcambio+xinicio>=0 and ycambio+yinicio<8 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
+				fichasCambio.append([xinicio+xcambio,yinicio+ycambio])
+				xcambio -= 1
+				ycambio += 1
+			if self.board[xinicio+xcambio][yinicio+ycambio] == ficha:
+				for i,j in fichasCambio:
+					self.board[i][j] = ficha
+
+
+	def voltearFichas(self,xinicio,yinicio,ficha):
+		self.check_vertical(ficha,xinicio,yinicio)
+		self.check_horizon(ficha,xinicio,yinicio)
+		self.check_diagonal(ficha,xinicio,yinicio)
+
+
+
+	# def voltearFichas(self,xinicio,yinicio,ficha):
+	# 	direcciones = [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]]
+	# 	fichasAVoltear = []
+	# 	direccionesCambio = []
+	# 	xcambio = 0
+	# 	ycambio = 0
+	# 	if ficha == 1:
+	# 		otraficha = 2
+	# 	if ficha == 2:
+	# 		otraficha = 1
+	# 	for x,y in direcciones:
+	# 		indexx = xinicio + x
+	# 		indexy = yinicio + y
+	# 		if self.jugada_en_tablero(indexx,indexy):
+	# 			if self.board[indexx][indexy] == otraficha:
+	# 				print(str(indexx) + " " + str(indexy))
+	# 				direccionesCambio.append([x,y])
+	# 				print(direccionesCambio)
+	# 	print(direccionesCambio)
+	# 	for i,j in direccionesCambio:
+	# 		xcambio = xinicio+i
+	# 		ycambio = yinicio+j
+	# 		while self.jugada_en_tablero(xcambio,ycambio) and self.board[xcambio][ycambio] == otraficha:
+	# 			fichasAVoltear.append([xcambio,ycambio])
+	# 			xcambio += i
+	# 			ycambio += j
+	# 	print(fichasAVoltear)
+	# 	# print(str(xcambio) + " " + str(ycambio))
+	# 	if self.board[xcambio][ycambio] == ficha:
+	# 		for i,j in fichasAVoltear:
+	# 			self.board[i][j] = ficha
+	# 	else:
+	# 		pass
+
+
 class Jugador():
 	puntos = 2
 	index = 0
+	nombre = ""
 
-	def __init__(self,game,index):
+	def __init__(self,index):
 		self.index = index

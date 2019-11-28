@@ -48,7 +48,7 @@ class Tablero():
 
 	def jugada_valida(self,x,y,turno):
 		if x>0 and y>0:
-			if x<(8-1) and y<(8-1):
+			if x<7 and y<7:
 				alrededor = [
 					self.board[y][x+1],
 					self.board[y+1][x+1],
@@ -59,7 +59,7 @@ class Tablero():
 					self.board[y][x-1],
 					self.board[y-1][x-1]
 				]
-			elif x==(8-1) and y<(8-1):
+			elif x==7 and y<7:
 				alrededor = [
 					self.board[y-1][x],
 					self.board[y+1][x],
@@ -67,7 +67,7 @@ class Tablero():
 					self.board[y][x-1],
 					self.board[y-1][x-1]
 				]
-			elif x<(8-1) and y==(8-1):
+			elif x<7 and y==7:
 				alrededor = [
 					self.board[y][x+1],
 					self.board[y-1][x+1],
@@ -75,14 +75,14 @@ class Tablero():
 					self.board[y][x-1],
 					self.board[y-1][x-1]
 				]
-			elif x==(8-1) and y==(8-1):
+			elif x==7 and y==7:
 				alrededor = [
 					self.board[y-1][x],
 					self.board[y][x-1],
 					self.board[y-1][x-1]
 				]
 		elif x==0 and y>0:
-			if y<(8-1):
+			if y<7:
 				alrededor = [
 					self.board[y][x+1],
 					self.board[y+1][x+1],
@@ -90,14 +90,14 @@ class Tablero():
 					self.board[y-1][x],
 					self.board[y+1][x],
 				]
-			elif y==(8-1):
+			elif y==7:
 				alrededor = [
 					self.board[y][x+1],
 					self.board[y-1][x+1],
 					self.board[y-1][x],
 				]
 		elif x>0 and y==0:
-			if x<(8-1):
+			if x<7:
 				alrededor = [
 					self.board[y][x+1],
 					self.board[y+1][x+1],
@@ -105,7 +105,7 @@ class Tablero():
 					self.board[y+1][x-1],
 					self.board[y][x-1],
 				]
-			elif x==(8-1):
+			elif x==7:
 				alrededor = [
 					self.board[y+1][x],
 					self.board[y+1][x-1],
@@ -168,15 +168,15 @@ class Tablero():
 		elif ficha == 2:
 			otraficha = 1
 		if self.board[xinicio][yinicio+1] == otraficha:
-			while ycambio+yinicio<8 and self.board[xinicio][ycambio+yinicio] == otraficha:
+			while ycambio+yinicio<7 and self.board[xinicio][ycambio+yinicio] == otraficha:
 				fichasCambio.append([xinicio,ycambio+yinicio])
 				ycambio += 1
 			if self.board[xinicio][yinicio+ycambio] == ficha:
 				for i,j in fichasCambio:
 					self.board[i][j] = ficha
-		if self.board[xinicio][yinicio] == otraficha:
+		if self.board[xinicio][yinicio-1] == otraficha:
 			ycambio = -1
-			while ycambio+yinicio>=0 and self.board[xinicio][ycambio+yinicio] == otraficha:
+			while ycambio+yinicio>0 and self.board[xinicio][ycambio+yinicio] == otraficha:
 				fichasCambio.append([xinicio,ycambio+yinicio])
 				ycambio -= 1
 			if self.board[xinicio][yinicio+ycambio] == ficha:
@@ -194,7 +194,7 @@ class Tablero():
 		elif ficha == 2:
 			otraficha = 1
 		if self.board[xinicio+1][yinicio] == otraficha:
-			while xcambio+xinicio<8 and self.board[xinicio+xcambio][yinicio] == otraficha:
+			while xcambio+xinicio<7 and self.board[xinicio+xcambio][yinicio] == otraficha:
 				fichasCambio.append([xinicio+xcambio,yinicio])
 				xcambio += 1
 			if self.board[xinicio+xcambio][yinicio] == ficha:
@@ -202,7 +202,7 @@ class Tablero():
 					self.board[i][j] = ficha		
 		if self.board[xinicio-1][yinicio] == otraficha:
 			xcambio = -1
-			while xcambio+xinicio>=0 and self.board[xinicio+xcambio][yinicio] == otraficha:
+			while xcambio+xinicio>0 and self.board[xinicio+xcambio][yinicio] == otraficha:
 				fichasCambio.append([xinicio+xcambio,yinicio])
 				xcambio -= 1
 			if self.board[xinicio+xcambio][yinicio] == ficha:
@@ -220,7 +220,7 @@ class Tablero():
 		ycambio = 1
 		xcambio = 1
 		if self.board[xinicio+1][yinicio+1] == otraficha:
-			while xcambio+xinicio<8 and ycambio+yinicio<8 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
+			while xcambio+xinicio<7 and ycambio+yinicio<7 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
 				fichasCambio.append([xinicio+xcambio,yinicio+ycambio])
 				xcambio += 1
 				ycambio += 1
@@ -230,7 +230,7 @@ class Tablero():
 		if self.board[xinicio-1][yinicio-1] == otraficha:
 			xcambio = -1
 			ycambio = -1
-			while xcambio+xinicio>=0 and ycambio+yinicio>=0 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
+			while xcambio+xinicio>0 and ycambio+yinicio>0 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
 				fichasCambio.append([xinicio+xcambio,yinicio+ycambio])
 				xcambio -= 1
 				ycambio -= 1
@@ -241,7 +241,7 @@ class Tablero():
 		if self.board[xinicio+1][yinicio-1] == otraficha:
 			xcambio = 1
 			ycambio = -1
-			while xcambio+xinicio<8 and ycambio+yinicio>=0 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
+			while xcambio+xinicio<7 and ycambio+yinicio>0 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
 				fichasCambio.append([xinicio+xcambio,yinicio+ycambio])
 				xcambio += 1
 				ycambio -= 1
@@ -252,7 +252,7 @@ class Tablero():
 		if self.board[xinicio-1][yinicio+1] == otraficha:
 			xcambio = -1
 			ycambio = 1
-			while xcambio+xinicio>=0 and ycambio+yinicio<8 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
+			while xcambio+xinicio>0 and ycambio+yinicio<7 and self.board[xinicio+xcambio][yinicio+ycambio] == otraficha:
 				fichasCambio.append([xinicio+xcambio,yinicio+ycambio])
 				xcambio -= 1
 				ycambio += 1

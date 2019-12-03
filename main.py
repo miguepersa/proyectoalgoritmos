@@ -31,15 +31,16 @@ class Game():
 	def run(self):
 		# Ciclo del juego
 		self.playing = True
+		self.puntos
 		while self.playing:
 			self.clock.tick(FPS)
 			self.events()
-			self.update()
+			# self.update()
 			self.draw()
-
-	def update(self):
-		# Actualizacion del Ciclo de juego
-		self.all_sprites.update()
+		if self.board.fichas_restantes == 0:
+			self.playing = False
+		if self.blancas.puntos == 0 or self.negras.puntos == 0:
+			self.playing = False
 
 	def puntos(self):
 		self.blancas.puntos = 0
@@ -66,20 +67,17 @@ class Game():
 				turno = self.turno
 				if self.board.jugada_valida(x,y,turno):
 					self.jugada_invalida = False
-					if self.turno == 1:
-						ficha = 1
-						self.board.board[x][y]=1
-						self.turno = 2
-					elif self.turno == 2:
-						ficha = 2
-						self.board.board[x][y]=2
-						self.turno = 1
-					self.board.voltearFichas(x,y,ficha)
+					ficha = self.board.cambiarTurno(self,x,y)
+					self.board.consumo(x,y,ficha)
 					self.puntos()
 					self.board.fichas_restantes -= 1
 
 				else:
 					self.jugada_invalida = True
+			if self.board.fichas_restantes == 0:
+				self.playing = False
+			elif self.blancas.puntos == 0 or self.negras.puntos == 0:
+				self.playing = False
 
 
 	def escribir_texto(self,surf,text,size,x,y):
@@ -284,10 +282,10 @@ class Game():
 
 		# dibujamos la interfaz
 		self.screen.fill(GREY)
-		self.draw_text(self.screen,self.blancas.nombre,50,ancho / 6, 20)
-		self.draw_text(self.screen,self.negras.nombre,50,(ancho * 5) / 6, 20)
-		self.draw_text(self.screen,str(self.blancas.puntos),50, ancho / 6, 60)
-		self.draw_text(self.screen,str(self.negras.puntos),50,(ancho * 5) / 6, 60)
+		self.escribir_texto(self.screen,self.blancas.nombre,50,WIDTH / 6, 20)
+		self.escribir_texto(self.screen,self.negras.nombre,50,(WIDTH * 5) / 6, 20)
+		self.escribir_texto(self.screen,str(self.blancas.puntos),50, WIDTH / 6, 60)
+		self.escribir_texto(self.screen,str(self.negras.puntos),50,(WIDTH * 5) / 6, 60)
 
 		# dibujamos en la pantalla el resultado de la partida
 		main_string = ''
@@ -299,25 +297,26 @@ class Game():
 		else:
 			main_string = 'Es un empate'
 
-		self.draw_text(self.screen,main_string,40, ancho / 2, 250)
-		self.draw_text(self.screen,'presionen \'Y\' para jugar otra vez.',30, ancho / 2, 350)
+		self.escribir_texto(self.screen,main_string,40, WIDTH / 2, 250)
+		self.escribir_texto(self.screen,'presionen \'Y\' para jugar otra vez.',30, WIDTH / 2, 350)
 
 		pg.display.flip()
 
 		# esperamos a que el usuario presione la tecla
-		key = self.wait_for_key()
+		key = self.esperar_tecla()
 
 		# si el usuario decidio seguir jugando entonces seguimos, de lo contrario cerramos el programa
 		if key != pg.K_y:
 			self.running = False
+			
+		self.blancas.puntos = 2
+		self.negras.puntos = 2
 
 g = Game()
 g.pantalla_inicio()
 g.entrada_nombres()
 while g.running:
 	g.new()
-	if g.board.fichas_restantes == 0:
-		g.playing = False
 	if g.running:
 		g.fin_juego()
 
